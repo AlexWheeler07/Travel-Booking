@@ -1,0 +1,47 @@
+// User data model (schema)
+const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
+
+const userSchema = mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: [true, "Please add a name"],
+    },
+    email: {
+      type: String,
+      required: [true, "Please add an email"],
+      unique: true,
+    },
+    password: {
+      type: String,
+      required: [true, "Please add a password"],
+    },
+    isAdmin: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  {
+    timestamps: true, // Automatically add createdAt and updatedAt
+  }
+);
+
+// Encrypt password before saving user
+userSchema.pre("save", async function (next) {
+  // Only hash password if it's been modified
+  if (!this.isModified("password")) {
+    next();
+  }
+
+  // Hash password with cost of 10
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+});
+
+// Method to check entered password against hashed password
+userSchema.methods.matchPassword = async function (enteredPassword) {
+  return await bcrypt.compare(enteredPassword, this.password);
+};
+
+module.exports = mongoose.model("User", userSchema);
