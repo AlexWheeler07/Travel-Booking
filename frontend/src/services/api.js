@@ -3,7 +3,7 @@ import axios from "axios";
 
 // Create axios instance with base URL
 const API = axios.create({
-  baseURL: "http://localhost:5000/api",
+  baseURL: "https://travel-booking-backend-bwm7.onrender.com/api",
 });
 
 // Add token to requests if it exists
